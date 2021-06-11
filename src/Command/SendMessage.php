@@ -48,7 +48,7 @@ class SendMessage extends Command
 //            $message = implode(' ', $message);
 //        }
         $discord = new Discord([
-            'token'  => 'ODUyNTc1NjEyMDg1NjAwMjU2.YMI06g.TyfLr_kYrI3Nlp-M-SwuGLztnmQ',
+            'token'  => '',
             'logger' => $this->logger,
         ]);
         $embed   = new Embed($discord);
