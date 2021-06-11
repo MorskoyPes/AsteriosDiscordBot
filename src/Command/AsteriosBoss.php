@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Command;
 
 use Psr\Log\LoggerInterface;
@@ -16,7 +17,7 @@ class AsteriosBoss extends Command
 {
     protected static $defaultName = 'app:boss-respawn';
 
-    public  $client;
+    public $client;
 //    /**
 //     * @var LoggerInterface
 //     */
@@ -45,9 +46,8 @@ class AsteriosBoss extends Command
     {
         try {
             $redis = new Client('tcp://127.0.0.1:6379');
-        }
-        catch (\Exception $e) {
-            throw new \Exception("Connection Redis is lost". $e->getMessage());
+        } catch (\Exception $e) {
+            throw new \Exception("Connection Redis is lost" . $e->getMessage());
         }
 
         $response = $this->client->request(
@@ -61,79 +61,75 @@ class AsteriosBoss extends Command
         $command = $this->getApplication()->find(SendMessage::getDefaultName());
 
         $format = 'Y-m-d H:i:s';
-        $now = new DateTime('now');
-
+        $now    = new DateTime('now');
 
         $bosses = [
-            'Kernon' => DateTime::createFromFormat($format, rtrim(preg_replace('/[a-zА-Яа-я\']/iu',
+            'Kernon'   => DateTime::createFromFormat($format, rtrim(preg_replace('/[a-zА-Яа-я\']/iu',
                 '', $crawler->selectLink('Kernon')->text()), ": ")),
-            'Hallate' => DateTime::createFromFormat($format, rtrim(preg_replace('/[a-zА-Яа-я\']/iu',
+            'Hallate'  => DateTime::createFromFormat($format, rtrim(preg_replace('/[a-zА-Яа-я\']/iu',
                 '', $crawler->selectLink('Hallate')->text()), ": ")),
             'Golkonda' => DateTime::createFromFormat($format, rtrim(preg_replace('/[a-zА-Яа-я\']/iu',
                 '', $crawler->selectLink('Golkonda')->text()), ": ")),
-            'Cabrio' => DateTime::createFromFormat($format, rtrim(preg_replace('/[a-zА-Яа-я\']/iu',
+            'Cabrio'   => DateTime::createFromFormat($format, rtrim(preg_replace('/[a-zА-Яа-я\']/iu',
                 '', $crawler->selectLink('Cabrio')->text()), ": ")),
         ];
 
         /*
          * Запись в базу, если она пустая
          */
-        if ($redis->exists('Kernon')){
+        if ($redis->exists('Kernon')) {
             $redis->set('Kernon', $bosses['Kernon']->format($format));
-        }
-        elseif ($redis->exists('Hallate')){
+        } elseif ($redis->exists('Hallate')) {
             $redis->set('Hallate', $bosses['Hallate']->format($format));
-        }
-        elseif ($redis->exists('Golkonda')){
+        } elseif ($redis->exists('Golkonda')) {
             $redis->set('Golkonda', $bosses['Golkonda']->format($format));
-        }
-        elseif ($redis->exists('Cabrio')){
+        } elseif ($redis->exists('Cabrio')) {
             $redis->set('Cabrio', $bosses['Cabrio']->format($format));
         }
 
         /*
          * Оповещение о респе боссов
          */
-        if (strtotime($bosses['Kernon']->format($format)) > strtotime($redis->get('Kernon'))){
+        if (strtotime($bosses['Kernon']->format($format)) > strtotime($redis->get('Kernon'))) {
             $message = [
-                'title' => 'Босс Kernon был убит',
+                'title'       => 'Босс Kernon был убит',
                 'description' => $bosses['Kernon']->format($format),
-                'field_name' => 'Начало респауна:',
+                'field_name'  => 'Начало респауна:',
                 'field_value' => $bosses['Kernon']->modify('+18 hours')->format($format),
-                'image' => 'https://asterios.tm/design/img/mob/25054.jpg',
+                'image'       => 'https://asterios.tm/design/img/mob/25054.jpg',
             ];
             $command->run(new ArrayInput(['message' => $message]), new NullOutput());
             $redis->set('Kernon', $bosses['Kernon']->modify('-18 hours')->format($format));
         }
-        if (strtotime($bosses['Hallate']->format($format)) > strtotime($redis->get('Hallate'))){
+        if (strtotime($bosses['Hallate']->format($format)) > strtotime($redis->get('Hallate'))) {
             $message = [
-                'title' => 'Босс Hallate был убит',
+                'title'       => 'Босс Hallate был убит',
                 'description' => $bosses['Hallate']->format($format),
-                'field_name' => 'Начало респауна:',
+                'field_name'  => 'Начало респауна:',
                 'field_value' => $bosses['Hallate']->modify('+18 hours')->format($format),
-                'image' => 'https://asterios.tm/design/img/mob/25220.jpg',
+                'image'       => 'https://asterios.tm/design/img/mob/25220.jpg',
             ];
             $command->run(new ArrayInput(['message' => $message]), new NullOutput());
             $redis->set('Hallate', $bosses['Hallate']->modify('-18 hours')->format($format));
         }
-        if (strtotime($bosses['Golkonda']->format($format)) > strtotime($redis->get('Golkonda'))){
+        if (strtotime($bosses['Golkonda']->format($format)) > strtotime($redis->get('Golkonda'))) {
             $message = [
-                'title' => 'Босс Golkonda был убит',
+                'title'       => 'Босс Golkonda был убит',
                 'description' => $bosses['Golkonda']->format($format),
-                'field_name' => 'Начало респауна:',
+                'field_name'  => 'Начало респауна:',
                 'field_value' => $bosses['Golkonda']->modify('+18 hours')->format($format),
-                'image' => 'https://asterios.tm/design/img/mob/25126.jpg',
+                'image'       => 'https://asterios.tm/design/img/mob/25126.jpg',
             ];
             $command->run(new ArrayInput(['message' => $message]), new NullOutput());
             $redis->set('Golkonda', $bosses['Golkonda']->modify('-18 hours')->format($format));
         }
-        if (strtotime($bosses['Cabrio']->format($format)) > strtotime($redis->get('Cabrio'))){
+        if (strtotime($bosses['Cabrio']->format($format)) > strtotime($redis->get('Cabrio'))) {
             $message = [
-                'title' => 'Босс Cabrio был убит',
+                'title'       => 'Босс Cabrio был убит',
                 'description' => $bosses['Cabrio']->format($format),
-                'field_name' => 'Начало респауна:',
+                'field_name'  => 'Начало респауна:',
                 'field_value' => $bosses['Cabrio']->modify('+18 hours')->format($format),
-                'image' => 'https://asterios.tm/design/img/mob/25035.jpg',
+                'image'       => 'https://asterios.tm/design/img/mob/25035.jpg',
             ];
             $command->run(new ArrayInput(['message' => $message]), new NullOutput());
             $redis->set('Cabrio', $bosses['Cabrio']->modify('-18 hours')->format($format));
@@ -142,21 +138,21 @@ class AsteriosBoss extends Command
         /*
          * Оповещение о начале респа
          */
-        $kernonStart = new DateTime($redis->get('Kernon'));
-        $hallateStart = new DateTime($redis->get('Hallate'));
+        $kernonStart   = new DateTime($redis->get('Kernon'));
+        $hallateStart  = new DateTime($redis->get('Hallate'));
         $golkondaStart = new DateTime($redis->get('Golkonda'));
-        $cabrioStart = new DateTime($redis->get('Cabrio'));
+        $cabrioStart   = new DateTime($redis->get('Cabrio'));
 
         if (strtotime($now->format($format)) >=
             strtotime($kernonStart->modify('+18 hour')->modify('+3 second')->format($format)) &&
             strtotime($now->format($format)) <=
-            strtotime($kernonStart->modify('-4 second')->format($format))){
+            strtotime($kernonStart->modify('-4 second')->format($format))) {
             $message = [
-                'title' => 'Начался респун Kernon',
+                'title'       => 'Начался респун Kernon',
                 'description' => $now,
-                'field_name' => 'Респаун будет до:',
+                'field_name'  => 'Респаун будет до:',
                 'field_value' => $now->modify('+12 hours')->format($format),
-                'image' => 'https://asterios.tm/design/img/mob/25054.jpg',
+                'image'       => 'https://asterios.tm/design/img/mob/25054.jpg',
             ];
             $command->run(new ArrayInput(['message' => $message]), new NullOutput());
             $now->modify('-12 hours')->format($format);
@@ -164,13 +160,13 @@ class AsteriosBoss extends Command
         if (strtotime($now->format($format)) >=
             strtotime($hallateStart->modify('+18 hour')->modify('+3 second')->format($format)) &&
             strtotime($now->format($format)) <=
-            strtotime($hallateStart->modify('-4 second')->format($format))){
+            strtotime($hallateStart->modify('-4 second')->format($format))) {
             $message = [
-                'title' => 'Начался респун Hallate',
+                'title'       => 'Начался респун Hallate',
                 'description' => $now,
-                'field_name' => 'Респаун будет до:',
+                'field_name'  => 'Респаун будет до:',
                 'field_value' => $now->modify('+12 hours')->format($format),
-                'image' => 'https://asterios.tm/design/img/mob/25220.jpg',
+                'image'       => 'https://asterios.tm/design/img/mob/25220.jpg',
             ];
             $command->run(new ArrayInput(['message' => $message]), new NullOutput());
             $now->modify('-12 hours')->format($format);
@@ -178,13 +174,13 @@ class AsteriosBoss extends Command
         if (strtotime($now->format($format)) >=
             strtotime($golkondaStart->modify('+18 hour')->modify('+3 second')->format($format)) &&
             strtotime($now->format($format)) <=
-            strtotime($golkondaStart->modify('-4 second')->format($format))){
+            strtotime($golkondaStart->modify('-4 second')->format($format))) {
             $message = [
-                'title' => 'Начался респун Golkonda',
+                'title'       => 'Начался респун Golkonda',
                 'description' => $now,
-                'field_name' => 'Респаун будет до:',
+                'field_name'  => 'Респаун будет до:',
                 'field_value' => $now->modify('+12 hours')->format($format),
-                'image' => 'https://asterios.tm/design/img/mob/25126.jpg',
+                'image'       => 'https://asterios.tm/design/img/mob/25126.jpg',
             ];
             $command->run(new ArrayInput(['message' => $message]), new NullOutput());
             $now->modify('-12 hours')->format($format);
@@ -192,13 +188,13 @@ class AsteriosBoss extends Command
         if (strtotime($now->format($format)) >=
             strtotime($cabrioStart->modify('+18 hour')->modify('+3 second')->format($format)) &&
             strtotime($now->format($format)) <=
-            strtotime($cabrioStart->modify('-4 second')->format($format))){
+            strtotime($cabrioStart->modify('-4 second')->format($format))) {
             $message = [
-                'title' => 'Начался респун Cabrio',
+                'title'       => 'Начался респун Cabrio',
                 'description' => $now,
-                'field_name' => 'Респаун будет до:',
+                'field_name'  => 'Респаун будет до:',
                 'field_value' => $now->modify('+12 hours')->format($format),
-                'image' => 'https://asterios.tm/design/img/mob/25035.jpg',
+                'image'       => 'https://asterios.tm/design/img/mob/25035.jpg',
             ];
             $command->run(new ArrayInput(['message' => $message]), new NullOutput());
             $now->modify('-12 hours')->format($format);
@@ -207,21 +203,21 @@ class AsteriosBoss extends Command
         /*
          * Оповещение за два часа до респа
          */
-        $kernonTwo = new DateTime($redis->get('Kernon'));
-        $hallateTwo = new DateTime($redis->get('Hallate'));
+        $kernonTwo   = new DateTime($redis->get('Kernon'));
+        $hallateTwo  = new DateTime($redis->get('Hallate'));
         $golkondaTwo = new DateTime($redis->get('Golkonda'));
-        $cabrioTwo = new DateTime($redis->get('Cabrio'));
+        $cabrioTwo   = new DateTime($redis->get('Cabrio'));
 
         if (strtotime($now->format($format)) >=
             strtotime($kernonTwo->modify('+28 hour')->modify('+3 second')->format($format)) &&
             strtotime($now->format($format)) <=
-            strtotime($kernonTwo->modify('-4 second')->format($format))){
+            strtotime($kernonTwo->modify('-4 second')->format($format))) {
             $message = [
-                'title' => 'До респа Kernon меньше 2 часов',
+                'title'       => 'До респа Kernon меньше 2 часов',
                 'description' => $now,
-                'field_name' => 'Респаун будет до:',
+                'field_name'  => 'Респаун будет до:',
                 'field_value' => $now->modify('+2 hours')->format($format),
-                'image' => 'https://asterios.tm/design/img/mob/25054.jpg',
+                'image'       => 'https://asterios.tm/design/img/mob/25054.jpg',
             ];
             $command->run(new ArrayInput(['message' => $message]), new NullOutput());
             $now->modify('-2 hours')->format($format);
@@ -229,13 +225,13 @@ class AsteriosBoss extends Command
         if (strtotime($now->format($format)) >=
             strtotime($hallateTwo->modify('+28 hour')->modify('+3 second')->format($format)) &&
             strtotime($now->format($format)) <=
-            strtotime($hallateTwo->modify('-4 second')->format($format))){
+            strtotime($hallateTwo->modify('-4 second')->format($format))) {
             $message = [
-                'title' => 'До респа Hallate меньше 2 часов',
+                'title'       => 'До респа Hallate меньше 2 часов',
                 'description' => $now,
-                'field_name' => 'Респаун будет до:',
+                'field_name'  => 'Респаун будет до:',
                 'field_value' => $now->modify('+2 hours')->format($format),
-                'image' => 'https://asterios.tm/design/img/mob/25220.jpg',
+                'image'       => 'https://asterios.tm/design/img/mob/25220.jpg',
             ];
             $command->run(new ArrayInput(['message' => $message]), new NullOutput());
             $now->modify('-2 hours')->format($format);
@@ -243,13 +239,13 @@ class AsteriosBoss extends Command
         if (strtotime($now->format($format)) >=
             strtotime($golkondaTwo->modify('+28 hour')->modify('+3 second')->format($format)) &&
             strtotime($now->format($format)) <=
-            strtotime($golkondaTwo->modify('-4 second')->format($format))){
+            strtotime($golkondaTwo->modify('-4 second')->format($format))) {
             $message = [
-                'title' => 'До респа Golkonda меньше 2 часов',
+                'title'       => 'До респа Golkonda меньше 2 часов',
                 'description' => $now,
-                'field_name' => 'Респаун будет до:',
+                'field_name'  => 'Респаун будет до:',
                 'field_value' => $now->modify('+2 hours')->format($format),
-                'image' => 'https://asterios.tm/design/img/mob/25126.jpg',
+                'image'       => 'https://asterios.tm/design/img/mob/25126.jpg',
             ];
             $command->run(new ArrayInput(['message' => $message]), new NullOutput());
             $now->modify('-2 hours')->format($format);
@@ -257,13 +253,13 @@ class AsteriosBoss extends Command
         if (strtotime($now->format($format)) >=
             strtotime($cabrioTwo->modify('+28 hour')->modify('+3 second')->format($format)) &&
             strtotime($now->format($format)) <=
-            strtotime($cabrioTwo->modify('-4 second')->format($format))){
+            strtotime($cabrioTwo->modify('-4 second')->format($format))) {
             $message = [
-                'title' => 'До респа Cabrio меньше 2 часов',
+                'title'       => 'До респа Cabrio меньше 2 часов',
                 'description' => $now,
-                'field_name' => 'Респаун будет до:',
+                'field_name'  => 'Респаун будет до:',
                 'field_value' => $now->modify('+2 hours')->format($format),
-                'image' => 'https://asterios.tm/design/img/mob/25035.jpg',
+                'image'       => 'https://asterios.tm/design/img/mob/25035.jpg',
             ];
             $command->run(new ArrayInput(['message' => $message]), new NullOutput());
             $now->modify('-2 hours')->format($format);
@@ -272,21 +268,21 @@ class AsteriosBoss extends Command
         /*
          * Оповещение за один час до респа
          */
-        $kernonOne = new DateTime($redis->get('Kernon'));
-        $hallateOne = new DateTime($redis->get('Hallate'));
+        $kernonOne   = new DateTime($redis->get('Kernon'));
+        $hallateOne  = new DateTime($redis->get('Hallate'));
         $golkondaOne = new DateTime($redis->get('Golkonda'));
-        $cabrioOne = new DateTime($redis->get('Cabrio'));
+        $cabrioOne   = new DateTime($redis->get('Cabrio'));
 
         if (strtotime($now->format($format)) >=
             strtotime($kernonOne->modify('+29 hour')->modify('+3 second')->format($format)) &&
             strtotime($now->format($format)) <=
-            strtotime($kernonOne->modify('-4 second')->format($format))){
+            strtotime($kernonOne->modify('-4 second')->format($format))) {
             $message = [
-                'title' => 'СПЕШИТЕ! До респа Kernon меньше часа',
+                'title'       => 'СПЕШИТЕ! До респа Kernon меньше часа',
                 'description' => $now,
-                'field_name' => 'Респаун будет до:',
+                'field_name'  => 'Респаун будет до:',
                 'field_value' => $now->modify('+1 hours')->format($format),
-                'image' => 'https://asterios.tm/design/img/mob/25054.jpg',
+                'image'       => 'https://asterios.tm/design/img/mob/25054.jpg',
             ];
             $command->run(new ArrayInput(['message' => $message]), new NullOutput());
             $now->modify('-1 hours')->format($format);
@@ -294,13 +290,13 @@ class AsteriosBoss extends Command
         if (strtotime($now->format($format)) >=
             strtotime($hallateOne->modify('+29 hour')->modify('+3 second')->format($format)) &&
             strtotime($now->format($format)) <=
-            strtotime($hallateOne->modify('-4 second')->format($format))){
+            strtotime($hallateOne->modify('-4 second')->format($format))) {
             $message = [
-                'title' => 'СПЕШИТЕ! До респа Hallate меньше часа',
+                'title'       => 'СПЕШИТЕ! До респа Hallate меньше часа',
                 'description' => $now,
-                'field_name' => 'Респаун будет до:',
+                'field_name'  => 'Респаун будет до:',
                 'field_value' => $now->modify('+1 hours')->format($format),
-                'image' => 'https://asterios.tm/design/img/mob/25220.jpg',
+                'image'       => 'https://asterios.tm/design/img/mob/25220.jpg',
             ];
             $command->run(new ArrayInput(['message' => $message]), new NullOutput());
             $now->modify('-1 hours')->format($format);
@@ -308,13 +304,13 @@ class AsteriosBoss extends Command
         if (strtotime($now->format($format)) >=
             strtotime($golkondaOne->modify('+29 hour')->modify('+3 second')->format($format)) &&
             strtotime($now->format($format)) <=
-            strtotime($golkondaOne->modify('-4 second')->format($format))){
+            strtotime($golkondaOne->modify('-4 second')->format($format))) {
             $message = [
-                'title' => 'СПЕШИТЕ! До респа Golkonda меньше часа',
+                'title'       => 'СПЕШИТЕ! До респа Golkonda меньше часа',
                 'description' => $now,
-                'field_name' => 'Респаун будет до:',
+                'field_name'  => 'Респаун будет до:',
                 'field_value' => $now->modify('+1 hours')->format($format),
-                'image' => 'https://asterios.tm/design/img/mob/25126.jpg',
+                'image'       => 'https://asterios.tm/design/img/mob/25126.jpg',
             ];
             $command->run(new ArrayInput(['message' => $message]), new NullOutput());
             $now->modify('-1 hours')->format($format);
@@ -322,13 +318,13 @@ class AsteriosBoss extends Command
         if (strtotime($now->format($format)) >=
             strtotime($cabrioOne->modify('+29 hour')->modify('+3 second')->format($format)) &&
             strtotime($now->format($format)) <=
-            strtotime($cabrioOne->modify('-4 second')->format($format))){
+            strtotime($cabrioOne->modify('-4 second')->format($format))) {
             $message = [
-                'title' => 'СПЕШИТЕ! До респа Calibrio меньше часа',
+                'title'       => 'СПЕШИТЕ! До респа Calibrio меньше часа',
                 'description' => $now,
-                'field_name' => 'Респаун будет до:',
+                'field_name'  => 'Респаун будет до:',
                 'field_value' => $now->modify('+1 hours')->format($format),
-                'image' => 'https://asterios.tm/design/img/mob/25035.jpg',
+                'image'       => 'https://asterios.tm/design/img/mob/25035.jpg',
             ];
             $command->run(new ArrayInput(['message' => $message]), new NullOutput());
             $now->modify('-1 hours')->format($format);
