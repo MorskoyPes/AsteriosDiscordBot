@@ -86,7 +86,7 @@ class SendMessage extends Command
             }
 
             foreach ($channels as $channel) {
-                $channel->sendMessage($message['title'], false, $embed)->done(function (Message $message) {
+                $channel->sendMessage($message['message'], false, $embed)->done(function (Message $message) {
                 }, function (NoPermissionsException $reason) use ($channel) {
                     $this->logger->error('{channelName}: {message}', [
                         'message'     => $reason->getMessage(),
